@@ -1,9 +1,15 @@
 const {Client} = require("discord.js")
 const {sucess} = require("./logger")
+// Commands
 const {ping} = require("./messages/ping")
+const {PokeCommands} = require("./messages/pokeapi")
+
 //Load .env file
 const client = new Client();
 require("dotenv").config()
+
+//Import command controller
+const {Commands} = require("./messages/commands")
 
 client.on("ready",()=>{
     sucess(`Bot inicado como ${client.user.tag}`)
@@ -25,6 +31,10 @@ const parseMessage = (message) => {
     }
 }
 
+// Add commands
+Commands.addCommand("ping",ping)
+Commands.addCommand("pokedex",PokeCommands.pokedex)
+
 client.on("message",(ctx)=>{
     if(ctx.author.id === process.env.BOT_ID){
         return
@@ -34,10 +44,8 @@ client.on("message",(ctx)=>{
         return
     }
     // Only add ur command
-    if(message.command === "ping"){
-        return ping(ctx)
-    }
-    return ctx.channel.send("`No existe el comando para referencias use !help`")
+    
+    Commands.run(message.command,ctx)
 
 })
 
